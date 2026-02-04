@@ -1,133 +1,142 @@
-import React, { useContext, useRef, useState } from 'react'
-import { uiContext } from '../App'
-import axios from 'axios'
-import toast from 'react-hot-toast'
-import "../otp.css"
-import { useNavigate } from 'react-router-dom'
+import React, { useContext, useRef, useState } from "react";
+import { uiContext } from "../App";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
-  const{ui, setUi} = useContext(uiContext)
+  const { ui } = useContext(uiContext);
+
   return (
-    <div>
-      {ui == 0 ? <Email /> : (ui == 1 ? <VerifyOtp /> : <SignupForm />)}
-    </div>
-  )
-}
+    <div className="min-h-screen bg-[#fafafa] flex items-center justify-center px-4">
+      <div className="w-full max-w-sm">
+        {ui === 0 ? <Email /> : ui === 1 ? <VerifyOtp /> : <SignupForm />}
 
-export default Signup
+        {/* Bottom Box (Login link) */}
+        <div className="mt-3 bg-white border border-gray-200 rounded-sm py-4 text-center text-sm">
+          Already have an account?{" "}
+          <a href="/login" className="text-[#0095f6] font-semibold">
+            Log in
+          </a>
+        </div>
 
-const Email = () => {
-  const{ui, setUi, email, setEmail} = useContext(uiContext)
-  const navigate = useNavigate()
-
-  function btnCLickhandler()
-  {
-    async function sendOtp()
-    {
-      try {
-        const res = await axios.post(import.meta.env.VITE_DOMAIN + "/api/otp/send-otp", {email})
-        // console.log(res)
-        setUi(1)
-      } catch (error) {
-        toast.error(error.response.data.error)
-      }
-    }
-    sendOtp()
-  }
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white shadow-lg rounded-2xl p-6 w-96">
-        <label
-          htmlFor="email"
-          className="block text-gray-700 font-medium mb-2 text-center"
-        >
-          Please Enter your email for OTP verification
-        </label>
-        <input
-          onChange={(e) => {
-            setEmail(e.target.value)
-          }}
-          id="email"
-          type="text"
-          placeholder="Enter your email"
-          className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
-        />
-        <button
-          onClick={btnCLickhandler}
-          className="w-full bg-blue-500 text-white font-semibold py-2 rounded-xl shadow-md hover:bg-blue-600 transition"
-        >
-          Send
-        </button>
-
-        <p className='text-right mt-2'>Already a user? <span onClick={() => {
-          navigate("/login")
-        }} className='text-blue-400 cursor-pointer'>Sign in</span> instead</p>
+        {/* Footer small text */}
+        <p className="text-xs text-gray-400 text-center mt-4">
+          By continuing, you agree to our Terms, Privacy Policy and Cookies Policy.
+        </p>
       </div>
     </div>
-  )
-}
+  );
+};
 
-const VerifyOtp = () => {
-  const inputRef = useRef([]);
-    const{email, setUi} = useContext(uiContext)
+export default Signup;
 
-  const [otp, setOtp] = useState(Array(6).fill("")); // store OTP digits
 
-  const focusInput = (index) => {
-    if (inputRef.current[index]) {
-      inputRef.current[index].focus();
+const Email = () => {
+  const { email, setEmail, setUi } = useContext(uiContext);
+
+  const btnCLickhandler = async () => {
+    try {
+      await axios.post(import.meta.env.VITE_DOMAIN + "/api/otp/send-otp", { email });
+      setUi(1);
+      toast.success("OTP sent!");
+    } catch (error) {
+      toast.error(error?.response?.data?.error || "Failed to send OTP");
     }
   };
 
+  return (
+    <div className="bg-white border border-gray-200 rounded-sm px-8 py-10">
+      <h1 className="text-3xl font-semibold text-center mb-8 tracking-tight">
+        Instagram
+      </h1>
+
+      <p className="text-sm text-gray-500 text-center mb-5">
+        Enter your email to get OTP verification
+      </p>
+
+      <input
+        onChange={(e) => setEmail(e.target.value)}
+        value={email}
+        type="email"
+        placeholder="Email"
+        className="w-full bg-[#fafafa] border border-gray-300 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-gray-400"
+      />
+
+      <button
+        onClick={btnCLickhandler}
+        className="w-full mt-4 bg-[#0095f6] text-white text-sm font-semibold py-2 rounded-md hover:bg-[#1877f2] transition"
+      >
+        Send OTP
+      </button>
+    </div>
+  );
+};
+
+/* ---------------- OTP Screen ---------------- */
+const VerifyOtp = () => {
+  const inputRef = useRef([]);
+  const { email, setUi } = useContext(uiContext);
+  const [otp, setOtp] = useState(Array(6).fill(""));
+
+  const focusInput = (index) => inputRef.current[index]?.focus();
+
   const handleChange = (e, index) => {
     const value = e.target.value;
-
     if (!/^\d$/.test(value)) {
       e.target.value = "";
       return;
     }
-
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
 
-    if (index < 5 && value) {
-      focusInput(index + 1);
-    }
+    if (index < 5) focusInput(index + 1);
   };
 
   const handleKeyDown = (e, index) => {
     if (e.key === "Backspace") {
       const newOtp = [...otp];
       if (otp[index]) {
-        // clear current value
         newOtp[index] = "";
         setOtp(newOtp);
       } else if (index > 0) {
-        // move focus back if current is empty
         focusInput(index - 1);
       }
     }
   };
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     const enteredOtp = otp.join("");
 
-    async function verify() {
-      try {
-        const res = await axios.post(import.meta.env.VITE_DOMAIN + "/api/otp/verify-otp", {otp : enteredOtp, email})
-        // console.log(res)
-        setUi(2)
-      } catch (error) {
-        toast.error(error.response.data.error)
-      }
+    if (enteredOtp.length < 6) {
+      toast.error("Please enter 6 digit OTP");
+      return;
     }
-    verify()
+
+    try {
+      await axios.post(import.meta.env.VITE_DOMAIN + "/api/otp/verify-otp", {
+        otp: enteredOtp,
+        email,
+      });
+      toast.success("OTP Verified!");
+      setUi(2);
+    } catch (error) {
+      toast.error(error?.response?.data?.error || "Invalid OTP");
+    }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 space-y-6">
-      <div className="flex space-x-3">
+    <div className="bg-white border border-gray-200 rounded-sm px-8 py-10">
+      <h1 className="text-3xl font-semibold text-center mb-8 tracking-tight">
+        Instagram
+      </h1>
+
+      <p className="text-sm text-gray-500 text-center mb-6">
+        Enter the 6-digit code sent to <span className="font-medium">{email}</span>
+      </p>
+
+      <div className="flex justify-between gap-2">
         {[...Array(6)].map((_, index) => (
           <input
             key={index}
@@ -138,25 +147,29 @@ const VerifyOtp = () => {
             value={otp[index]}
             onChange={(e) => handleChange(e, index)}
             onKeyDown={(e) => handleKeyDown(e, index)}
-            className="w-12 h-12 text-center border border-gray-300 rounded-lg text-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-11 h-11 text-center text-lg bg-[#fafafa] border border-gray-300 rounded-md focus:outline-none focus:border-gray-400"
           />
         ))}
       </div>
 
       <button
         onClick={handleVerify}
-        className="px-6 py-2 bg-blue-500 text-white rounded-xl shadow-md hover:bg-blue-600 transition"
+        className="w-full mt-6 bg-[#0095f6] text-white text-sm font-semibold py-2 rounded-md hover:bg-[#1877f2] transition"
       >
         Verify OTP
+      </button>
+
+      <button
+        onClick={() => setUi(0)}
+        className="w-full mt-3 text-sm text-gray-500 hover:text-gray-700"
+      >
+        Change email
       </button>
     </div>
   );
 };
 
-
-
-
-
+/* ---------------- Signup Form ---------------- */
 const SignupForm = () => {
   const [formData, setFormData] = useState({
     firstName: "",
@@ -176,49 +189,45 @@ const SignupForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // 🔥 Replace with your backend endpoint
-      const res = await axios.post(
-        import.meta.env.VITE_DOMAIN + "/api/auth/signup",
-        formData
-      );
-      console.log(res.data);
+      await axios.post(import.meta.env.VITE_DOMAIN + "/api/auth/signup", formData);
       toast.success("Signup successful 🎉");
     } catch (error) {
-      toast.error(error.response?.data?.error || "Signup failed");
+      toast.error(error?.response?.data?.error || "Signup failed");
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white shadow-lg rounded-2xl p-6 w-[28rem] space-y-4"
-      >
-        <h2 className="text-2xl font-bold text-center text-gray-800">Signup</h2>
+    <div className="bg-white border border-gray-200 rounded-sm px-8 py-10">
+      <h1 className="text-3xl font-semibold text-center mb-3 tracking-tight">
+        Instagram
+      </h1>
 
-        {/* First & Last Name */}
-        <div className="flex space-x-2">
+      <p className="text-sm text-gray-500 text-center mb-6">
+        Sign up to see photos and videos from your friends.
+      </p>
+
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <div className="flex gap-2">
           <input
             type="text"
             name="firstName"
-            placeholder="First Name"
+            placeholder="First name"
             value={formData.firstName}
             onChange={handleChange}
             required
-            className="w-1/2 px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-1/2 bg-[#fafafa] border border-gray-300 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-gray-400"
           />
           <input
             type="text"
             name="lastName"
-            placeholder="Last Name"
+            placeholder="Last name"
             value={formData.lastName}
             onChange={handleChange}
             required
-            className="w-1/2 px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-1/2 bg-[#fafafa] border border-gray-300 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-gray-400"
           />
         </div>
 
-        {/* Email */}
         <input
           type="email"
           name="mail"
@@ -226,10 +235,9 @@ const SignupForm = () => {
           value={formData.mail}
           onChange={handleChange}
           required
-          className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full bg-[#fafafa] border border-gray-300 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-gray-400"
         />
 
-        {/* Username */}
         <input
           type="text"
           name="username"
@@ -237,10 +245,9 @@ const SignupForm = () => {
           value={formData.username}
           onChange={handleChange}
           required
-          className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full bg-[#fafafa] border border-gray-300 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-gray-400"
         />
 
-        {/* Password */}
         <input
           type="password"
           name="password"
@@ -248,39 +255,36 @@ const SignupForm = () => {
           value={formData.password}
           onChange={handleChange}
           required
-          className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full bg-[#fafafa] border border-gray-300 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-gray-400"
         />
 
-        {/* DOB */}
         <input
           type="date"
           name="dateOfBirth"
           value={formData.dateOfBirth}
           onChange={handleChange}
           required
-          className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full bg-[#fafafa] border border-gray-300 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-gray-400"
         />
 
-        {/* Gender */}
         <select
           name="gender"
           value={formData.gender}
           onChange={handleChange}
           required
-          className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full bg-[#fafafa] border border-gray-300 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-gray-400"
         >
-          <option value="">Select Gender</option>
+          <option value="">Gender</option>
           <option value="male">Male</option>
           <option value="female">Female</option>
           <option value="other">Other</option>
         </select>
 
-        {/* Submit */}
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white font-semibold py-2 rounded-xl shadow-md hover:bg-blue-600 transition"
+          className="w-full bg-[#0095f6] text-white text-sm font-semibold py-2 rounded-md hover:bg-[#1877f2] transition"
         >
-          Signup
+          Sign up
         </button>
       </form>
     </div>
