@@ -2,26 +2,29 @@ import React, { useContext, useRef, useState } from "react";
 import { uiContext } from "../App";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const { ui } = useContext(uiContext);
 
   return (
-    <div className="min-h-screen bg-[#fafafa] flex items-center justify-center px-4">
-      <div className="w-full max-w-sm">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-[#fde2e4] via-[#fbcfe8] to-[#e0e7ff] px-4">
+
+      
+      <div className="absolute -top-40 left-1/2 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-pink-300/30 blur-[140px]" />
+      <div className="absolute bottom-0 right-0 h-[500px] w-[500px] rounded-full bg-purple-300/30 blur-[140px]" />
+
+      <div className="relative z-10 w-full max-w-sm">
         {ui === 0 ? <Email /> : ui === 1 ? <VerifyOtp /> : <SignupForm />}
 
-        {/* Bottom Box (Login link) */}
-        <div className="mt-3 bg-white border border-gray-200 rounded-sm py-4 text-center text-sm">
+        {/* Bottom Box */}
+        <div className="mt-4 rounded-2xl bg-white/80 py-4 text-center text-sm shadow-lg backdrop-blur-md">
           Already have an account?{" "}
-          <a href="/login" className="text-[#0095f6] font-semibold">
+          <a href="/login" className="font-semibold text-[#dd2a7b] hover:underline">
             Log in
           </a>
         </div>
 
-        {/* Footer small text */}
-        <p className="text-xs text-gray-400 text-center mt-4">
+        <p className="mt-4 text-center text-xs text-gray-500">
           By continuing, you agree to our Terms, Privacy Policy and Cookies Policy.
         </p>
       </div>
@@ -30,6 +33,7 @@ const Signup = () => {
 };
 
 export default Signup;
+
 
 
 const Email = () => {
@@ -46,12 +50,12 @@ const Email = () => {
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-sm px-8 py-10">
-      <h1 className="text-3xl font-semibold text-center mb-8 tracking-tight">
+    <div className="rounded-2xl bg-white/90 px-8 py-10 shadow-2xl backdrop-blur-md">
+      <h1 className="mb-6 text-center font-serif text-4xl font-bold tracking-wide bg-gradient-to-r from-[#f58529] via-[#dd2a7b] to-[#8134af] bg-clip-text text-transparent">
         Instagram
       </h1>
 
-      <p className="text-sm text-gray-500 text-center mb-5">
+      <p className="mb-5 text-center text-sm text-gray-600">
         Enter your email to get OTP verification
       </p>
 
@@ -60,12 +64,12 @@ const Email = () => {
         value={email}
         type="email"
         placeholder="Email"
-        className="w-full bg-[#fafafa] border border-gray-300 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-gray-400"
+        className="w-full rounded-full border border-gray-300 bg-[#FAFAFA] px-5 py-2.5 text-sm outline-none focus:border-[#dd2a7b] focus:ring-2 focus:ring-[#f5c2e7]"
       />
 
       <button
         onClick={btnCLickhandler}
-        className="w-full mt-4 bg-[#0095f6] text-white text-sm font-semibold py-2 rounded-md hover:bg-[#1877f2] transition"
+        className="mt-5 w-full rounded-full bg-gradient-to-r from-[#f58529] via-[#dd2a7b] to-[#8134af] py-2.5 text-sm font-semibold text-white shadow-md hover:opacity-95"
       >
         Send OTP
       </button>
@@ -73,7 +77,8 @@ const Email = () => {
   );
 };
 
-/* ---------------- OTP Screen ---------------- */
+
+
 const VerifyOtp = () => {
   const inputRef = useRef([]);
   const { email, setUi } = useContext(uiContext);
@@ -90,25 +95,17 @@ const VerifyOtp = () => {
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
-
     if (index < 5) focusInput(index + 1);
   };
 
   const handleKeyDown = (e, index) => {
-    if (e.key === "Backspace") {
-      const newOtp = [...otp];
-      if (otp[index]) {
-        newOtp[index] = "";
-        setOtp(newOtp);
-      } else if (index > 0) {
-        focusInput(index - 1);
-      }
+    if (e.key === "Backspace" && index > 0 && !otp[index]) {
+      focusInput(index - 1);
     }
   };
 
   const handleVerify = async () => {
     const enteredOtp = otp.join("");
-
     if (enteredOtp.length < 6) {
       toast.error("Please enter 6 digit OTP");
       return;
@@ -127,12 +124,12 @@ const VerifyOtp = () => {
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-sm px-8 py-10">
-      <h1 className="text-3xl font-semibold text-center mb-8 tracking-tight">
+    <div className="rounded-2xl bg-white/90 px-8 py-10 shadow-2xl backdrop-blur-md">
+      <h1 className="mb-6 text-center font-serif text-4xl font-bold tracking-wide bg-gradient-to-r from-[#f58529] via-[#dd2a7b] to-[#8134af] bg-clip-text text-transparent">
         Instagram
       </h1>
 
-      <p className="text-sm text-gray-500 text-center mb-6">
+      <p className="mb-6 text-center text-sm text-gray-600">
         Enter the 6-digit code sent to <span className="font-medium">{email}</span>
       </p>
 
@@ -141,27 +138,25 @@ const VerifyOtp = () => {
           <input
             key={index}
             ref={(el) => (inputRef.current[index] = el)}
-            type="text"
-            inputMode="numeric"
             maxLength={1}
             value={otp[index]}
             onChange={(e) => handleChange(e, index)}
             onKeyDown={(e) => handleKeyDown(e, index)}
-            className="w-11 h-11 text-center text-lg bg-[#fafafa] border border-gray-300 rounded-md focus:outline-none focus:border-gray-400"
+            className="h-11 w-11 rounded-xl border border-gray-300 bg-[#FAFAFA] text-center text-lg outline-none focus:border-[#dd2a7b] focus:ring-2 focus:ring-[#f5c2e7]"
           />
         ))}
       </div>
 
       <button
         onClick={handleVerify}
-        className="w-full mt-6 bg-[#0095f6] text-white text-sm font-semibold py-2 rounded-md hover:bg-[#1877f2] transition"
+        className="mt-6 w-full rounded-full bg-gradient-to-r from-[#f58529] via-[#dd2a7b] to-[#8134af] py-2.5 text-sm font-semibold text-white shadow-md hover:opacity-95"
       >
         Verify OTP
       </button>
 
       <button
         onClick={() => setUi(0)}
-        className="w-full mt-3 text-sm text-gray-500 hover:text-gray-700"
+        className="mt-3 w-full text-sm text-gray-500 hover:text-gray-700"
       >
         Change email
       </button>
@@ -169,7 +164,8 @@ const VerifyOtp = () => {
   );
 };
 
-/* ---------------- Signup Form ---------------- */
+
+
 const SignupForm = () => {
   const [formData, setFormData] = useState({
     firstName: "",
@@ -181,10 +177,8 @@ const SignupForm = () => {
     gender: "",
   });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  const handleChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -197,82 +191,54 @@ const SignupForm = () => {
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-sm px-8 py-10">
-      <h1 className="text-3xl font-semibold text-center mb-3 tracking-tight">
+    <div className="rounded-2xl bg-white/90 px-8 py-10 shadow-2xl backdrop-blur-md">
+      <h1 className="mb-3 text-center font-serif text-4xl font-bold tracking-wide bg-gradient-to-r from-[#f58529] via-[#dd2a7b] to-[#8134af] bg-clip-text text-transparent">
         Instagram
       </h1>
 
-      <p className="text-sm text-gray-500 text-center mb-6">
+      <p className="mb-6 text-center text-sm text-gray-600">
         Sign up to see photos and videos from your friends.
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-3">
         <div className="flex gap-2">
           <input
-            type="text"
             name="firstName"
             placeholder="First name"
             value={formData.firstName}
             onChange={handleChange}
             required
-            className="w-1/2 bg-[#fafafa] border border-gray-300 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-gray-400"
+            className="w-1/2 rounded-full border bg-[#FAFAFA] px-4 py-2 text-sm outline-none focus:border-[#dd2a7b] focus:ring-2 focus:ring-[#f5c2e7]"
           />
           <input
-            type="text"
             name="lastName"
             placeholder="Last name"
             value={formData.lastName}
             onChange={handleChange}
             required
-            className="w-1/2 bg-[#fafafa] border border-gray-300 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-gray-400"
+            className="w-1/2 rounded-full border bg-[#FAFAFA] px-4 py-2 text-sm outline-none focus:border-[#dd2a7b] focus:ring-2 focus:ring-[#f5c2e7]"
           />
         </div>
 
-        <input
-          type="email"
-          name="mail"
-          placeholder="Email"
-          value={formData.mail}
-          onChange={handleChange}
-          required
-          className="w-full bg-[#fafafa] border border-gray-300 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-gray-400"
-        />
-
-        <input
-          type="text"
-          name="username"
-          placeholder="Username"
-          value={formData.username}
-          onChange={handleChange}
-          required
-          className="w-full bg-[#fafafa] border border-gray-300 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-gray-400"
-        />
-
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-          className="w-full bg-[#fafafa] border border-gray-300 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-gray-400"
-        />
-
-        <input
-          type="date"
-          name="dateOfBirth"
-          value={formData.dateOfBirth}
-          onChange={handleChange}
-          required
-          className="w-full bg-[#fafafa] border border-gray-300 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-gray-400"
-        />
+        {["mail", "username", "password", "dateOfBirth"].map((field) => (
+          <input
+            key={field}
+            type={field === "password" ? "password" : field === "dateOfBirth" ? "date" : "text"}
+            name={field}
+            placeholder={field}
+            value={formData[field]}
+            onChange={handleChange}
+            required
+            className="w-full rounded-full border bg-[#FAFAFA] px-4 py-2 text-sm outline-none focus:border-[#dd2a7b] focus:ring-2 focus:ring-[#f5c2e7]"
+          />
+        ))}
 
         <select
           name="gender"
           value={formData.gender}
           onChange={handleChange}
           required
-          className="w-full bg-[#fafafa] border border-gray-300 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-gray-400"
+          className="w-full rounded-full border bg-[#FAFAFA] px-4 py-2 text-sm outline-none focus:border-[#dd2a7b] focus:ring-2 focus:ring-[#f5c2e7]"
         >
           <option value="">Gender</option>
           <option value="male">Male</option>
@@ -282,7 +248,7 @@ const SignupForm = () => {
 
         <button
           type="submit"
-          className="w-full bg-[#0095f6] text-white text-sm font-semibold py-2 rounded-md hover:bg-[#1877f2] transition"
+          className="w-full rounded-full bg-gradient-to-r from-[#f58529] via-[#dd2a7b] to-[#8134af] py-2.5 text-sm font-semibold text-white shadow-md hover:opacity-95"
         >
           Sign up
         </button>
