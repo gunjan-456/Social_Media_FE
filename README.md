@@ -1,16 +1,113 @@
-# React + Vite
+📸 Instagram Clone – Full Stack Social Media Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A production-style Instagram inspired social media platform built using the MERN stack with real-world features like authentication, privacy system, follow requests, posts, likes, comments, and chat functionality.
 
-Currently, two official plugins are available:
+🚀 Live-Style Features
+🔐 Authentication & Security
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Secure Login & Signup
 
-## React Compiler
+JWT-based Authentication
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Protected Routes (Frontend + Backend)
 
-## Expanding the ESLint configuration
+Password Hashing using Bcrypt
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Session-based API handling
+
+👤 User Profile System
+
+Edit Profile (Name + Bio)
+
+Change Password
+
+Upload Profile Picture (Base64 image handling)
+
+Public / Private Account Toggle
+
+Dynamic profile statistics (Posts, Followers, Following)
+
+🖼 Post System
+
+Create Post with Image Upload
+
+Instagram-style Feed
+
+Like / Unlike Posts
+
+Comment System
+
+Nested Reply System
+
+Optimistic UI updates
+
+Hover overlays with like & comment count
+
+👥 Follow & Privacy Logic
+
+Follow / Unfollow Users
+
+Private Account Follow Requests
+
+Accept / Reject Requests
+
+Cancel Follow Requests
+
+Request Status Check API
+
+💬 Chat System
+
+Chat Interface
+
+Dynamic routing for conversations
+
+UI structured for real-time scalability
+
+🛠 Tech Stack
+Frontend
+
+React.js
+
+Redux Toolkit
+
+React Router DOM
+
+Tailwind CSS
+
+Axios
+
+React Hot Toast
+
+Backend
+
+Node.js
+
+Express.js
+
+MongoDB
+
+Mongoose
+
+JWT
+
+Bcrypt
+
+CORS
+
+🧠 Real-World Concepts Implemented
+
+RESTful API architecture
+
+Role-based privacy logic
+
+Optimistic UI updates
+
+Middleware-based route protection
+
+Modular folder structure
+
+Redux state synchronization
+
+Proper error handling
+
+Secure authentication flow
